@@ -2,9 +2,16 @@ import random
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 from PIL import Image, ImageTk
+import difflib
+from ui import setup_styles, create_title_label
+from tkinter import ttk  # Ajout de cette ligne
 from players_db import players_db
+from difflib import SequenceMatcher
+
+
 
 class MorpionFootball:
+    
     def __init__(self, root):
         self.root = root
         self.grid_size = 3
@@ -30,12 +37,14 @@ class MorpionFootball:
             "Brésil": "images/brazil.png",
             "Portugal": "images/portugal.png",
             "Croatie": "images/croatia.png",
+            "Allemagne": "images/germany.png",
         }
         
         club_paths = {
-            "Real Madrid": "images/real_madrid.png",
+         "Real Madrid": "images/real_madrid.png",
             "Bayern Munich": "images/bayern.png",
             "Manchester United": "images/man_united.png",
+            "Juventus": "images/juventus.png",
             "PSG": "images/psg.png",
             "Barcelone": "images/barcelona.png",
             "Coupe du monde": "images/world_cup.png",
@@ -44,6 +53,8 @@ class MorpionFootball:
             "Euro": "images/euro.png",
             "Ligue 1": "images/ligue_1.png",
             "Liga": "images/liga.png",
+            "Serie A": "images/serie_a.png",
+            "Bundesliga": "images/bundesliga.png",
         }
         
         flags = {}
@@ -64,6 +75,7 @@ class MorpionFootball:
         self.create_widgets()
         self.reset_game()
 
+
     def create_widgets(self):
         self.score_label = tk.Label(self.root, text=self.get_score_text())
         self.score_label.grid(row=0, columnspan=self.grid_size + 3)
@@ -71,22 +83,31 @@ class MorpionFootball:
         self.turn_label = tk.Label(self.root, text=f"À {self.current_player} de jouer")
         self.turn_label.grid(row=1, columnspan=self.grid_size + 3)
 
+        # Grille de jeu
         self.buttons = [[None for _ in range(self.grid_size)] for _ in range(self.grid_size)]
         for row in range(self.grid_size):
             for col in range(self.grid_size):
                 button = tk.Button(self.root, text="", width=15, height=5,
-                                   command=lambda r=row, c=col: self.make_move(r, c))
+                                command=lambda r=row, c=col: self.make_move(r, c))
                 button.grid(row=row + 3, column=col + 2)
                 self.buttons[row][col] = button
 
         self.pass_button = tk.Button(self.root, text="Passe ton tour", command=self.pass_turn)
         self.pass_button.grid(row=self.grid_size + 5, columnspan=self.grid_size + 3)
 
-        self.reset_button = tk.Button(self.root, text="Rejouer", command=self.reset_game, state=tk.DISABLED)
-        self.reset_button.grid(row=self.grid_size + 6, columnspan=self.grid_size + 3)
-
         self.draw_button = tk.Button(self.root, text="Match nul", command=self.confirm_draw)
-        self.draw_button.grid(row=self.grid_size + 7, columnspan=self.grid_size + 3)
+        self.draw_button.grid(row=self.grid_size + 6, columnspan=self.grid_size + 3)
+
+        # Ajouter les widgets pour la recherche en bas
+        self.search_entry = tk.Entry(self.root)
+        self.search_entry.grid(row=self.grid_size + 7, column=0, columnspan=2)
+
+        self.search_button = tk.Button(self.root, text="Rechercher", command=self.search_player)
+        self.search_button.grid(row=self.grid_size + 7, column=2)
+
+        self.search_result_label = tk.Label(self.root, text="")
+        self.search_result_label.grid(row=self.grid_size + 8, column=0, columnspan=self.grid_size + 3)
+
 
     def confirm_draw(self):
         response = messagebox.askyesno("Confirmation", "Voulez-vous vraiment déclarer un match nul?")
@@ -157,6 +178,7 @@ class MorpionFootball:
             messagebox.showinfo("Gagné", "Joueur 2 a gagné la partie!")
             self.reset_game(True)
 
+
     def reset_game(self, reset_scores=False):
         if reset_scores:
             self.scores = {"Joueur 1": 0, "Joueur 2": 0}
@@ -175,14 +197,14 @@ class MorpionFootball:
             if self.row_categories[i] in self.flags:
                 row_label = tk.Label(self.root, image=self.flags[self.row_categories[i]], text=self.row_categories[i], compound="top")
             else:
-                row_label = tk.Label(self.root, image=self.clubs[self.row_categories[i]], text=self.row_categories[i], compound="top")
+                row_label = tk.Label(self.root, image=self.clubs.get(self.row_categories[i], None), text=self.row_categories[i], compound="top")
             row_label.grid(row=i + 3, column=0)
             self.labels.append(row_label)
 
             if self.column_categories[i] in self.flags:
                 column_label = tk.Label(self.root, image=self.flags[self.column_categories[i]], text=self.column_categories[i], compound="top")
             else:
-                column_label = tk.Label(self.root, image=self.clubs[self.column_categories[i]], text=self.column_categories[i], compound="top")
+                column_label = tk.Label(self.root, image=self.clubs.get(self.column_categories[i], None), text=self.column_categories[i], compound="top")
             column_label.grid(row=2, column=i + 2)
             self.labels.append(column_label)
 
@@ -193,25 +215,25 @@ class MorpionFootball:
         self.current_player = self.first_player
         self.first_player = "Joueur 1" if self.first_player == "Joueur 2" else "Joueur 2"
         self.turn_label.config(text=f"À {self.current_player} de jouer", bg=self.colors[self.current_player])
-        self.reset_button.config(state=tk.DISABLED)
+        self.draw_button.config(state=tk.NORMAL)
 
+        # Réinitialiser les résultats de recherche
+        self.search_result_label.config(text="")
+
+    
     def pass_turn(self):
         self.switch_player()
 
     def generate_valid_categories(self):
         while True:
-            national_categories = ["Argentine", "France", "Espagne", "Angleterre", "Brésil", "Portugal", "Croatie","Allemagne"]
-            other_categories = ["Coupe du monde", "Copa America", "Ligue des Champions", "Euro", "Ligue 1", "Liga", "Real Madrid", "PSG", "Barcelone","Liverpool","Manchester United","Bayern Munich"]
+            all_categories = ["Argentine", "France", "Espagne", "Angleterre", "Brésil", "Portugal", "Croatie","Allemagne",
+                              "Coupe du monde", "Copa America", "Ligue des Champions", "Euro", "Ligue 1", "Liga","Bundesliga","Serie A", 
+                              "Real Madrid", "PSG", "Barcelone","Liverpool","Juventus","Manchester United","Bayern Munich"]
+            random.shuffle(all_categories)
 
-            random.shuffle(national_categories)
-            random.shuffle(other_categories)
-
-            if random.choice([True, False]):
-                row_categories = random.sample(national_categories, self.grid_size)
-                column_categories = random.sample(other_categories, self.grid_size)
-            else:
-                row_categories = random.sample(other_categories, self.grid_size)
-                column_categories = random.sample(national_categories, self.grid_size)
+            row_categories = random.sample(all_categories, self.grid_size)
+            all_categories= [a for a in all_categories if a not in row_categories]
+            column_categories = random.sample(all_categories, self.grid_size)
 
             if self.validate_grid(row_categories, column_categories):
                 return row_categories, column_categories
@@ -224,8 +246,19 @@ class MorpionFootball:
                            for player in self.players_db):
                     return False
         return True
+        
+    def search_player(self):
+        query = self.search_entry.get()
+        if not query:
+            self.search_result_label.config(text="Veuillez entrer un nom de joueur.")
+            return
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    game = MorpionFootball(root)
-    root.mainloop()
+        matches = difflib.get_close_matches(query, self.players_db.keys(), n=3, cutoff=0.0)
+        result_text = "Résultats de la recherche :\n"
+        for match in matches:
+            similarity = difflib.SequenceMatcher(None, query, match).ratio()
+            result_text += f"{match} - {similarity * 100:.0f}%\n"
+
+        self.search_result_label.config(text=result_text)
+
+
