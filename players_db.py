@@ -20,17 +20,17 @@ players_db = {
         "competitions": [
             "Coupe du monde",
             "Ligue des Champions",
+            "Euro",
             "Ligue 1",
-            "Serie A",
             "Liga",
-            "Euro"
+            "Serie A"
         ],
         "clubs": [
-            "Juventus",
-            "Real Madrid"
+            "Real Madrid",
+            "Juventus"
         ],
-        "matches": 0,
-        "goals": 0
+        "matches": 828,
+        "goals": 160
     },
     "Mbappe": {
         "country": "France",
@@ -568,17 +568,17 @@ players_db = {
     "Hazard": {
         "country": "Belgique",
         "competitions": [
-            "Premier League",
-            "Ligue 1",
             "Ligue des Champions",
-            "Liga"
+            "Ligue 1",
+            "Liga",
+            "Premier League"
         ],
         "clubs": [
-            "Chelsea",
-            "Real Madrid"
+            "Real Madrid",
+            "Chelsea"
         ],
-        "matches": 0,
-        "goals": 0
+        "matches": 747,
+        "goals": 200
     },
     "Giroud": {
         "country": "France",
@@ -709,5 +709,31 @@ players_db = {
         ],
         "matches": 698,
         "goals": 52
+    },
+    "Casillas": {
+        "country": "Espagne",
+        "competitions": [
+            "Coupe du monde",
+            "Ligue des Champions",
+            "Euro",
+            "Liga"
+        ],
+        "clubs": [
+            "Real Madrid",
+            "Porto"
+        ],
+        "matches": 1048,
+        "goals": 0
+    },
+    "Benzema": {
+        "country": "France",
+        "competitions": [
+            "Ligue 1"
+        ],
+        "clubs": [
+            "Real Madrid"
+        ],
+        "matches": 670,
+        "goals": 360
     }
 }

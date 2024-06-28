@@ -27,7 +27,8 @@ class PlayerManager:
 
         tk.Label(self.add_tab, text="Nationalité:").grid(row=1, column=0, padx=5, pady=5)
         self.add_nationality_var = tk.StringVar()
-        self.add_nationality_menu = ttk.Combobox(self.add_tab, textvariable=self.add_nationality_var, values=["Argentine", "France", "Brésil", "Portugal", "Italie", "Allemagne", "Angleterre", "Belgique", "Croatie"])
+        self.add_nationality_menu = ttk.Combobox(self.add_tab, textvariable=self.add_nationality_var, values=["Argentine", "France", "Brésil", "Portugal", "Italie", "Allemagne",
+                                                                                                               "Angleterre", "Belgique", "Croatie","Espagne","Pays-Bas"])
         self.add_nationality_menu.grid(row=1, column=1, padx=5, pady=5)
 
         tk.Label(self.add_tab, text="Compétitions:").grid(row=2, column=0, padx=5, pady=5)
@@ -37,7 +38,8 @@ class PlayerManager:
 
         tk.Label(self.add_tab, text="Clubs:").grid(row=6, column=0, padx=5, pady=5)
         self.add_club_vars = {club: tk.BooleanVar() for club in ["Real Madrid", "PSG", "Barcelone", "Liverpool", "Juventus", "AC Milan", "Chelsea", "Manchester United",
-                                                                 "Manchester City", "Bayern Munich", "Arsenal", "Monaco", "Borussia Dortmund", "Atletico Madrid"]}
+                                                                 "Manchester City", "Bayern Munich", "Arsenal", "Monaco", "Borussia Dortmund", 
+                                                                 "Atletico Madrid","Inter Milan","Benfica","Porto","Ajax"]}
         for i, club in enumerate(self.add_club_vars):
             tk.Checkbutton(self.add_tab, text=club, variable=self.add_club_vars[club]).grid(row=6+i//3, column=1+i%3, sticky="w")
 
@@ -55,7 +57,8 @@ class PlayerManager:
     def create_modify_widgets(self):
         tk.Label(self.modify_tab, text="Nationalité:").grid(row=0, column=0, padx=5, pady=5)
         self.modify_nationality_var = tk.StringVar()
-        self.modify_nationality_menu = ttk.Combobox(self.modify_tab, textvariable=self.modify_nationality_var, values=["Argentine", "France", "Brésil", "Portugal", "Italie", "Allemagne", "Angleterre", "Belgique", "Croatie"])
+        self.modify_nationality_menu = ttk.Combobox(self.modify_tab, textvariable=self.modify_nationality_var, values=["Argentine", "France", "Brésil", "Portugal", "Italie", "Allemagne", 
+                                                                                                                       "Angleterre", "Belgique", "Croatie","Espagne","Pays-Bas"])
         self.modify_nationality_menu.grid(row=0, column=1, padx=5, pady=5)
         self.modify_nationality_menu.bind("<<ComboboxSelected>>", self.update_player_list)
 
@@ -76,7 +79,8 @@ class PlayerManager:
 
         tk.Label(self.modify_tab, text="Clubs:").grid(row=7, column=0, padx=5, pady=5)
         self.modify_club_vars = {club: tk.BooleanVar() for club in ["Real Madrid", "PSG", "Barcelone", "Liverpool", "Juventus", "AC Milan", "Chelsea", "Manchester United",
-                                                                    "Manchester City", "Bayern Munich", "Arsenal", "Monaco", "Borussia Dortmund", "Atletico Madrid"]}
+                                                                    "Manchester City", "Bayern Munich", "Arsenal", "Monaco", "Borussia Dortmund", "Atletico Madrid",
+                                                                    "Inter Milan","Benfica","Porto","Ajax"]}
         for i, club in enumerate(self.modify_club_vars):
             tk.Checkbutton(self.modify_tab, text=club, variable=self.modify_club_vars[club]).grid(row=7+i//3, column=1+i%3, sticky="w")
 
@@ -206,7 +210,12 @@ class PlayerManager:
         self.modify_matches_entry.delete(0, "end")
         self.modify_goals_entry.delete(0, "end")
 
-if __name__ == "__main__":
+def main():
     root = tk.Tk()
     app = PlayerManager(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()
+
+
